@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="theme-color" content="#0e1621">
+<title>Оценка работодателей</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.24.0/dist/tabler-icons.min.css">
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#0e1621;color:#fff;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;font-weight:400}
+.tgapp{max-width:520px;margin:0 auto;padding-bottom:24px}
+.hidden{display:none}
+.tg-head{padding:16px 16px 10px}
+.tg-titlebar{display:flex;align-items:center;justify-content:space-between;font-size:18px;font-weight:500}
+.tg-titlebar i{color:#7d8b99}
+.tg-sub{font-size:12px;color:#7d8b99;margin-top:2px}
+.tg-tabs{display:flex;gap:4px;margin:0 16px 12px;background:#16212d;border-radius:10px;padding:4px}
+.tg-tab{flex:1;border:0;background:transparent;color:#7d8b99;font-size:14px;padding:9px;border-radius:8px;cursor:pointer;font-family:inherit}
+.tg-tab.active{background:#31465e;color:#fff;font-weight:500}
+.tg-body{padding:0 14px}
+.tg-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.tg-stat{background:#182532;border-radius:12px;padding:10px}
+.tg-stat .lbl{font-size:11px;color:#7d8b99}
+.tg-stat .num{font-size:18px;font-weight:500;margin-top:2px}
+.tg-stat .num.blue{color:#3aa0ff}.tg-stat .num.pink{color:#ff5c8a}.tg-stat .num.sm{font-size:14px}
+.tg-stat .subv{font-size:12px;color:#ff5c8a}
+.tg-crit-card{background:#182532;border-radius:14px;padding:14px;margin-bottom:12px}
+.tg-crit-head{display:flex;align-items:baseline;gap:8px;margin-bottom:10px}
+.tg-crit-head>span:first-child{font-size:15px;font-weight:500}
+.tg-crit-hint{font-size:11px;color:#7d8b99}
+.tg-crit-list{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+.tg-crit-chip{display:flex;align-items:center;gap:6px;background:#22344a;color:#cfe3ff;border-radius:16px;padding:5px 6px 5px 12px;font-size:13px}
+.tg-crit-chip button{border:0;background:transparent;color:#7fa8cc;cursor:pointer;display:flex;align-items:center;font-size:14px;padding:0}
+.tg-card{background:#182532;border-radius:14px;padding:14px;margin-bottom:10px}
+.tg-card-head{display:flex;align-items:center;gap:6px}
+.tg-place{flex:1;font-size:15px;font-weight:500}
+.tg-avg{background:#22344a;color:#cfe3ff;border-radius:8px;padding:2px 8px;font-size:13px;margin-right:2px}
+.tg-hbtn{width:32px;height:32px;flex:none;border:0;background:transparent;color:#7d8b99;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:17px;border-radius:8px}
+.tg-hbtn.del{color:#e06a7a}
+.tg-hbtn:active{transform:scale(.92)}
+.tg-row{margin-top:12px}
+.tg-row-top{display:flex;justify-content:space-between;font-size:13px;color:#8696a7}
+.tg-row-top .tg-val{color:#fff;font-weight:500;font-size:14px}
+.tg-slider{display:flex;align-items:center;gap:8px;margin-top:6px}
+.tg-step{width:34px;height:34px;flex:none;border:1px solid rgba(255,255,255,.12);background:transparent;color:#cfd8e3;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:15px}
+.tg-step:active{transform:scale(.95)}
+input[type=range]{-webkit-appearance:none;appearance:none;flex:1;height:6px;border-radius:6px;background:#2b3a4d;outline:none}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:#3aa0ff;border:3px solid #0e1621;cursor:pointer}
+input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;background:#3aa0ff;border:3px solid #0e1621;cursor:pointer}
+.tg-add{display:flex;gap:8px;margin-top:8px}
+.tg-add input{flex:1;background:#182532;border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:11px 12px;color:#fff;font-size:14px;font-family:inherit;outline:none}
+.tg-crit-card .tg-add input{background:#0e1621}
+.tg-iconbtn{width:44px;flex:none;border:0;background:#2e6da6;color:#fff;border-radius:10px;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center}
+.tg-empty,.tg-hint{color:#7d8b99;font-size:13px;padding:6px 0}
+.tg-chiprow{display:flex;gap:8px;margin-bottom:10px}
+.tg-chiprow.wrap{flex-wrap:wrap}
+.tg-chip{border:1px solid rgba(255,255,255,.12);background:transparent;color:#8696a7;border-radius:16px;padding:7px 14px;font-size:13px;cursor:pointer;font-family:inherit}
+.tg-chip.active{background:#3aa0ff;border-color:#3aa0ff;color:#08263d;font-weight:500}
+.tg-filter{margin-bottom:10px}
+.tg-flabel{font-size:12px;color:#7d8b99;margin-bottom:6px}
+.tg-fchip{border:1px solid rgba(255,255,255,.12);background:transparent;color:#8696a7;border-radius:14px;padding:6px 12px;font-size:12px;cursor:pointer;font-family:inherit}
+.tg-fchip.active{background:#22344a;border-color:#3a567a;color:#cfe3ff}
+.tg-hintline{font-size:12px;color:#ffb02e;margin:2px 0 8px}
+.tg-legend{display:flex;flex-wrap:wrap;gap:12px;font-size:12px;color:#cfd8e3;margin-bottom:8px}
+.tg-legend .lg{display:flex;align-items:center;gap:5px}
+.tg-legend .sw{width:10px;height:10px;border-radius:3px;display:inline-block}
+.tg-chartbox{position:relative;height:320px}
+.tg-foot{text-align:center;color:#5b6b7a;font-size:12px;padding:14px 10px 0}
+</style>
+</head>
+<body>
+<div class="tgapp">
+  <div class="tg-head">
+    <div class="tg-titlebar"><span>Оценка работодателей</span><i class="ti ti-briefcase" aria-hidden="true"></i></div>
+    <div class="tg-sub">Сравнение собеседований по критериям</div>
+  </div>
+  <div class="tg-tabs">
+    <button class="tg-tab active" data-tab="rate">Оценки</button>
+    <button class="tg-tab" data-tab="charts">Графики</button>
+  </div>
+  <div class="tg-body">
+    <div class="tg-stats" id="stats"></div>
+    <div class="tg-view" id="view-rate">
+      <div class="tg-crit-card">
+        <div class="tg-crit-head"><span>Критерии</span><span class="tg-crit-hint">общие для всех мест</span></div>
+        <div class="tg-crit-list" id="critList"></div>
+        <div class="tg-add">
+          <input id="newCrit" placeholder="Новый критерий…" aria-label="Новый критерий">
+          <button id="addCrit" class="tg-iconbtn" aria-label="Добавить критерий"><i class="ti ti-plus" aria-hidden="true"></i></button>
+        </div>
+      </div>
+      <div id="places"></div>
+      <div class="tg-add">
+        <input id="newPlace" placeholder="Новое место…" aria-label="Новое место">
+        <button id="addPlace" class="tg-iconbtn" aria-label="Добавить место"><i class="ti ti-plus" aria-hidden="true"></i></button>
+      </div>
+    </div>
+    <div class="tg-view hidden" id="view-charts">
+      <div class="tg-chiprow wrap" id="chartTypes">
+        <button class="tg-chip active" data-ct="radar">Радар</button>
+        <button class="tg-chip" data-ct="bar">Столбцы</button>
+        <button class="tg-chip" data-ct="avg">Средний</button>
+        <button class="tg-chip" data-ct="rating">Рейтинг</button>
+      </div>
+      <div class="tg-filter"><div class="tg-flabel">Критерии в графике</div><div class="tg-chiprow wrap" id="fCrit"></div></div>
+      <div class="tg-filter"><div class="tg-flabel">Места в графике</div><div class="tg-chiprow wrap" id="fPlace"></div></div>
+      <div class="tg-hintline" id="chartHint"></div>
+      <div class="tg-legend" id="legend"></div>
+      <div class="tg-chartbox"><canvas id="chart" role="img" aria-label="График сравнения работодателей по выбранным критериям и местам"></canvas></div>
+    </div>
+  </div>
+  <div class="tg-foot">@vacanciiresultbot</div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+var tg=(window.Telegram&&Telegram.WebApp)?Telegram.WebApp:null;
+if(tg){try{tg.ready();tg.expand();if(tg.setHeaderColor)tg.setHeaderColor('#0e1621');if(tg.setBackgroundColor)tg.setBackgroundColor('#0e1621');}catch(e){}}
+
+let state={};
+const KEY='employerRatingData';
+const PAL=['#3aa0ff','#ff5c8a','#5fd07f','#ffb02e','#a78bfa','#36d6c3'];
+
+function normalize(){if(!state.places)state.places=[];if(!state.criteria)state.criteria=[];if(!state.ratings)state.ratings={};if(!state.collapsed)state.collapsed={};if(!state.exclCrit)state.exclCrit={};if(!state.exclPlace)state.exclPlace={};if(!state.chartType)state.chartType='radar';}
+function seedDefaults(){state={places:[],criteria:[{id:'c1',name:'Зарплата'},{id:'c2',name:'Коллектив'},{id:'c3',name:'Задачи'},{id:'c4',name:'Офис'},{id:'c5',name:'Руководитель'}],ratings:{},collapsed:{},exclCrit:{},exclPlace:{},chartType:'radar'};}
+function save(){const j=JSON.stringify(state);try{localStorage.setItem(KEY,j);}catch(e){}if(tg&&tg.CloudStorage&&tg.CloudStorage.setItem){try{tg.CloudStorage.setItem(KEY,j);}catch(e){}}}
+function load(){
+  let have=false;
+  try{const v=localStorage.getItem(KEY);if(v){state=JSON.parse(v);have=true;}}catch(e){}
+  if(!have)seedDefaults();
+  normalize();
+  if(tg&&tg.CloudStorage&&tg.CloudStorage.getItem){try{tg.CloudStorage.getItem(KEY,function(err,val){if(!err&&val){try{state=JSON.parse(val);normalize();renderAll();}catch(e){}}});}catch(e){}}
+}
+
+function avgOf(p){let s=0,n=0;state.criteria.forEach(c=>{const v=state.ratings[p.id+':'+c.id];if(v!=null){s+=v;n++;}});return n?s/n:null;}
+function selCrits(){return state.criteria.filter(c=>!state.exclCrit[c.id]);}
+function selPlaces(){return state.places.filter(p=>!state.exclPlace[p.id]);}
+function avgSel(p){let s=0,n=0;selCrits().forEach(c=>{const v=state.ratings[p.id+':'+c.id];if(v!=null){s+=v;n++;}});return n?s/n:null;}
+function fillEl(el){const v=(el.value-1)/9*100;el.style.background='linear-gradient(90deg,#3aa0ff '+v+'%, #2b3a4d '+v+'%)';}
+function chartsVisible(){return !document.getElementById('view-charts').classList.contains('hidden');}
+
+function renderStats(){
+  const onCharts=chartsVisible();
+  const ps=onCharts?selPlaces():state.places;
+  const fn=onCharts?avgSel:avgOf;
+  let leader=null,best=-1;
+  ps.forEach(p=>{const a=fn(p);if(a!=null&&a>best){best=a;leader=p;}});
+  const lbl=onCharts?'Лидер · выбор':'Лидер';
+  document.getElementById('stats').innerHTML=
+   '<div class="tg-stat"><div class="lbl">Мест</div><div class="num">'+state.places.length+'</div></div>'+
+   '<div class="tg-stat"><div class="lbl">Критериев</div><div class="num blue">'+state.criteria.length+'</div></div>'+
+   '<div class="tg-stat"><div class="lbl">'+lbl+'</div><div class="num pink sm">'+(leader?leader.name:'—')+'</div><div class="subv">'+(leader?best.toFixed(1):'')+'</div></div>';
+}
+
+function renderCriteria(){
+  const el=document.getElementById('critList');
+  if(!state.criteria.length){el.innerHTML='<div class="tg-hint">Пока нет критериев — добавь ниже</div>';return;}
+  el.innerHTML=state.criteria.map(c=>'<span class="tg-crit-chip">'+c.name+'<button data-delcrit="'+c.id+'" aria-label="удалить критерий"><i class="ti ti-x" aria-hidden="true"></i></button></span>').join('');
+}
+
+function renderFilters(){
+  const fc=document.getElementById('fCrit');
+  fc.innerHTML=state.criteria.length?state.criteria.map(c=>'<button class="tg-fchip'+(state.exclCrit[c.id]?'':' active')+'" data-fc="'+c.id+'">'+c.name+'</button>').join(''):'<span class="tg-hint">нет критериев</span>';
+  const fp=document.getElementById('fPlace');
+  fp.innerHTML=state.places.length?state.places.map(p=>'<button class="tg-fchip'+(state.exclPlace[p.id]?'':' active')+'" data-fp="'+p.id+'">'+p.name+'</button>').join(''):'<span class="tg-hint">нет мест</span>';
+}
+
+function renderPlaces(){
+  const el=document.getElementById('places');
+  if(!state.places.length){el.innerHTML='<div class="tg-empty">Добавь первое место ниже</div>';return;}
+  el.innerHTML=state.places.map(p=>{
+    const a=avgOf(p);const col=!!state.collapsed[p.id];
+    const rows=state.criteria.length?state.criteria.map(c=>{
+      const v=state.ratings[p.id+':'+c.id];
+      return '<div class="tg-row"><div class="tg-row-top"><span>'+c.name+'</span><span class="tg-val" data-val="'+p.id+':'+c.id+'">'+(v==null?'—':v)+'</span></div>'+
+        '<div class="tg-slider"><button class="tg-step" data-step="-1" data-p="'+p.id+'" data-c="'+c.id+'" aria-label="меньше"><i class="ti ti-minus" aria-hidden="true"></i></button>'+
+        '<input type="range" min="1" max="10" step="1" value="'+(v==null?5:v)+'" data-p="'+p.id+'" data-c="'+c.id+'">'+
+        '<button class="tg-step" data-step="1" data-p="'+p.id+'" data-c="'+c.id+'" aria-label="больше"><i class="ti ti-plus" aria-hidden="true"></i></button></div></div>';
+    }).join(''):'<div class="tg-hint">Добавь критерии выше</div>';
+    return '<div class="tg-card" data-place="'+p.id+'"><div class="tg-card-head"><span class="tg-place">'+p.name+'</span>'+
+      '<span class="tg-avg" data-avg="'+p.id+'">'+(a==null?'—':a.toFixed(1))+'</span>'+
+      '<button class="tg-hbtn" data-toggle="'+p.id+'" aria-label="свернуть или развернуть"><i class="ti ti-chevron-'+(col?'down':'up')+'" aria-hidden="true"></i></button>'+
+      '<button class="tg-hbtn del" data-delplace="'+p.id+'" aria-label="удалить место"><i class="ti ti-trash" aria-hidden="true"></i></button></div>'+
+      '<div class="tg-criteria'+(col?' hidden':'')+'">'+rows+'</div></div>';
+  }).join('');
+  el.querySelectorAll('input[type=range]').forEach(fillEl);
+}
+
+let chart;
+function val(pid,cid){const v=state.ratings[pid+':'+cid];return v==null?0:v;}
+function buildChart(){
+  if(typeof Chart==='undefined')return;
+  const type=state.chartType||'radar';
+  const crits=selCrits(),places=selPlaces();
+  const hintEl=document.getElementById('chartHint');hintEl.textContent='';
+  const lg=document.getElementById('legend');
+  if(!places.length||!crits.length){if(chart){chart.destroy();chart=null;}lg.innerHTML='';hintEl.textContent='Выбери хотя бы одно место и один критерий.';return;}
+  if(type==='radar'&&crits.length<3)hintEl.textContent='Для радара лучше выбрать 3+ критерия.';
+  const cv=document.getElementById('chart');
+  if(chart)chart.destroy();
+  let cfg,legend=[];
+  if(type==='radar'){
+    cfg={type:'radar',data:{labels:crits.map(c=>c.name),datasets:places.map((p,i)=>({label:p.name,data:crits.map(c=>val(p.id,c.id)),borderColor:PAL[i%PAL.length],backgroundColor:PAL[i%PAL.length]+'33',pointBackgroundColor:PAL[i%PAL.length],borderWidth:2}))},
+      options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{r:{min:0,max:10,ticks:{stepSize:2,color:'#5b6b7a',backdropColor:'transparent',font:{size:11}},grid:{color:'rgba(255,255,255,.08)'},angleLines:{color:'rgba(255,255,255,.08)'},pointLabels:{color:'#cfd8e3',font:{size:12}}}}}};
+    legend=places.map((p,i)=>({label:p.name,color:PAL[i%PAL.length]}));
+  }else if(type==='bar'){
+    cfg={type:'bar',data:{labels:places.map(p=>p.name),datasets:crits.map((c,i)=>({label:c.name,data:places.map(p=>val(p.id,c.id)),backgroundColor:PAL[i%PAL.length],borderRadius:4}))},
+      options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{min:0,max:10,ticks:{stepSize:2,color:'#5b6b7a'},grid:{color:'rgba(255,255,255,.08)'}},x:{ticks:{color:'#cfd8e3'},grid:{display:false}}}}};
+    legend=crits.map((c,i)=>({label:c.name,color:PAL[i%PAL.length]}));
+  }else if(type==='avg'){
+    const data=places.map(p=>{const a=avgSel(p);return a==null?0:+a.toFixed(1);});
+    cfg={type:'bar',data:{labels:places.map(p=>p.name),datasets:[{label:'Средний балл',data:data,backgroundColor:places.map((p,i)=>PAL[i%PAL.length]),borderRadius:6}]},
+      options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{min:0,max:10,ticks:{stepSize:2,color:'#5b6b7a'},grid:{color:'rgba(255,255,255,.08)'}},x:{ticks:{color:'#cfd8e3'},grid:{display:false}}}}};
+  }else{
+    const arr=places.map(p=>{const a=avgSel(p);return{name:p.name,v:a==null?0:+a.toFixed(1)};}).sort((a,b)=>b.v-a.v);
+    cfg={type:'bar',data:{labels:arr.map(a=>a.name),datasets:[{label:'Средний балл',data:arr.map(a=>a.v),backgroundColor:arr.map((a,i)=>PAL[i%PAL.length]),borderRadius:6}]},
+      options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{min:0,max:10,ticks:{stepSize:2,color:'#5b6b7a'},grid:{color:'rgba(255,255,255,.08)'}},y:{ticks:{color:'#cfd8e3'},grid:{display:false}}}}};
+  }
+  chart=new Chart(cv,cfg);
+  lg.innerHTML=legend.map(l=>'<span class="lg"><span class="sw" style="background:'+l.color+'"></span>'+l.label+'</span>').join('');
+}
+function refreshChart(){if(chartsVisible())buildChart();}
+
+function renderAll(){renderStats();renderCriteria();renderFilters();renderPlaces();refreshChart();}
+
+function setRating(p,c,v){
+  state.ratings[p+':'+c]=v;save();
+  const vl=document.querySelector('[data-val="'+p+':'+c+'"]');if(vl)vl.textContent=v;
+  const pl=state.places.find(x=>x.id===p);const al=document.querySelector('[data-avg="'+p+'"]');
+  if(pl&&al){const a=avgOf(pl);al.textContent=a==null?'—':a.toFixed(1);}
+  renderStats();refreshChart();
+}
+
+const placesEl=document.getElementById('places');
+placesEl.addEventListener('input',e=>{if(e.target.matches('input[type=range]')){const t=e.target;setRating(t.dataset.p,t.dataset.c,+t.value);fillEl(t);}});
+placesEl.addEventListener('click',e=>{
+  const step=e.target.closest('.tg-step');
+  if(step){const p=step.dataset.p,c=step.dataset.c,cur=state.ratings[p+':'+c];let nv=(cur==null?5:cur)+(+step.dataset.step);nv=Math.max(1,Math.min(10,nv));const inp=step.parentElement.querySelector('input');inp.value=nv;fillEl(inp);setRating(p,c,nv);return;}
+  const tog=e.target.closest('[data-toggle]');
+  if(tog){const id=tog.dataset.toggle;state.collapsed[id]=!state.collapsed[id];save();renderPlaces();return;}
+  const del=e.target.closest('[data-delplace]');
+  if(del){const id=del.dataset.delplace;state.places=state.places.filter(x=>x.id!==id);Object.keys(state.ratings).forEach(k=>{if(k.split(':')[0]===id)delete state.ratings[k];});delete state.collapsed[id];delete state.exclPlace[id];save();renderPlaces();renderStats();renderFilters();refreshChart();}
+});
+
+document.getElementById('critList').addEventListener('click',e=>{
+  const d=e.target.closest('[data-delcrit]');
+  if(d){const id=d.dataset.delcrit;state.criteria=state.criteria.filter(x=>x.id!==id);Object.keys(state.ratings).forEach(k=>{if(k.split(':')[1]===id)delete state.ratings[k];});delete state.exclCrit[id];save();renderCriteria();renderPlaces();renderStats();renderFilters();refreshChart();}
+});
+
+document.getElementById('fCrit').addEventListener('click',e=>{const b=e.target.closest('[data-fc]');if(!b)return;const id=b.dataset.fc;if(state.exclCrit[id])delete state.exclCrit[id];else state.exclCrit[id]=true;save();renderFilters();renderStats();buildChart();});
+document.getElementById('fPlace').addEventListener('click',e=>{const b=e.target.closest('[data-fp]');if(!b)return;const id=b.dataset.fp;if(state.exclPlace[id])delete state.exclPlace[id];else state.exclPlace[id]=true;save();renderFilters();renderStats();buildChart();});
+
+function addPlace(){const i=document.getElementById('newPlace'),n=i.value.trim();if(!n)return;state.places.push({id:'p'+Date.now(),name:n});i.value='';save();renderPlaces();renderStats();renderFilters();refreshChart();}
+function addCrit(){const i=document.getElementById('newCrit'),n=i.value.trim();if(!n)return;state.criteria.push({id:'c'+Date.now(),name:n});i.value='';save();renderCriteria();renderPlaces();renderStats();renderFilters();refreshChart();}
+document.getElementById('addPlace').onclick=addPlace;
+document.getElementById('addCrit').onclick=addCrit;
+document.getElementById('newPlace').addEventListener('keydown',e=>{if(e.key==='Enter')addPlace();});
+document.getElementById('newCrit').addEventListener('keydown',e=>{if(e.key==='Enter')addCrit();});
+
+document.querySelectorAll('.tg-tab').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('.tg-tab').forEach(x=>x.classList.toggle('active',x===b));
+  const t=b.dataset.tab;
+  document.getElementById('view-rate').classList.toggle('hidden',t!=='rate');
+  document.getElementById('view-charts').classList.toggle('hidden',t!=='charts');
+  renderStats();
+  if(t==='charts')buildChart();
+});
+document.querySelectorAll('#chartTypes .tg-chip').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('#chartTypes .tg-chip').forEach(x=>x.classList.toggle('active',x===b));
+  state.chartType=b.dataset.ct;save();buildChart();
+});
+
+load();
+renderAll();
+</script>
+</body>
+</html>
