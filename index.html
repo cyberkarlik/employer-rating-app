@@ -122,15 +122,20 @@ let state={};
 const KEY='employerRatingData';
 const PAL=['#3aa0ff','#ff5c8a','#5fd07f','#ffb02e','#a78bfa','#36d6c3'];
 
-function normalize(){if(!state.places)state.places=[];if(!state.criteria)state.criteria=[];if(!state.ratings)state.ratings={};if(!state.collapsed)state.collapsed={};if(!state.exclCrit)state.exclCrit={};if(!state.exclPlace)state.exclPlace={};if(!state.chartType)state.chartType='radar';}
-function seedDefaults(){state={places:[],criteria:[{id:'c1',name:'Зарплата'},{id:'c2',name:'Коллектив'},{id:'c3',name:'Задачи'},{id:'c4',name:'Офис'},{id:'c5',name:'Руководитель'}],ratings:{},collapsed:{},exclCrit:{},exclPlace:{},chartType:'radar'};}
-function save(){const j=JSON.stringify(state);try{localStorage.setItem(KEY,j);}catch(e){}if(tg&&tg.CloudStorage&&tg.CloudStorage.setItem){try{tg.CloudStorage.setItem(KEY,j);}catch(e){}}}
+function normalize(){if(!state.places)state.places=[];if(!state.criteria)state.criteria=[];if(!state.ratings)state.ratings={};if(!state.collapsed)state.collapsed={};if(!state.exclCrit)state.exclCrit={};if(!state.exclPlace)state.exclPlace={};if(!state.chartType)state.chartType='radar';if(typeof state.updatedAt!=='number')state.updatedAt=0;}
+function seedDefaults(){state={places:[],criteria:[{id:'c1',name:'Зарплата'},{id:'c2',name:'Коллектив'},{id:'c3',name:'Задачи'},{id:'c4',name:'Офис'},{id:'c5',name:'Руководитель'}],ratings:{},collapsed:{},exclCrit:{},exclPlace:{},chartType:'radar',updatedAt:0};}
+function save(){state.updatedAt=Date.now();const j=JSON.stringify(state);try{localStorage.setItem(KEY,j);}catch(e){}if(tg&&tg.CloudStorage&&tg.CloudStorage.setItem){try{tg.CloudStorage.setItem(KEY,j);}catch(e){}}}
 function load(){
   let have=false;
   try{const v=localStorage.getItem(KEY);if(v){state=JSON.parse(v);have=true;}}catch(e){}
   if(!have)seedDefaults();
   normalize();
-  if(tg&&tg.CloudStorage&&tg.CloudStorage.getItem){try{tg.CloudStorage.getItem(KEY,function(err,val){if(!err&&val){try{state=JSON.parse(val);normalize();renderAll();}catch(e){}}});}catch(e){}}
+  if(tg&&tg.CloudStorage&&tg.CloudStorage.getItem){try{tg.CloudStorage.getItem(KEY,function(err,val){
+    if(err)return;
+    if(val){var cloud=null;try{cloud=JSON.parse(val);}catch(e){}
+      if(cloud&&(cloud.updatedAt||0)>(state.updatedAt||0)){state=cloud;normalize();try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){}renderAll();return;}}
+    if((state.updatedAt||0)>0){try{tg.CloudStorage.setItem(KEY,JSON.stringify(state));}catch(e){}}
+  });}catch(e){}}
 }
 
 function avgOf(p){let s=0,n=0;state.criteria.forEach(c=>{const v=state.ratings[p.id+':'+c.id];if(v!=null){s+=v;n++;}});return n?s/n:null;}
